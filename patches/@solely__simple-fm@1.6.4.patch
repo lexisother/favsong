@@ -1,0 +1,42 @@
+diff --git a/dist/base.js b/dist/base.js
+index 3ac40c4d8163c09a885cbeb25320612181476fc0..77656c13a2ab60a9dcf2bacb1425c279394510c5 100644
+--- a/dist/base.js
++++ b/dist/base.js
+@@ -1,9 +1,8 @@
+-import { pkg } from './utils/package.js';
+ import { LastFMRequest } from './request.js';
+ export default class Base {
+     key;
+     userAgent;
+-    constructor(key, userAgent = `simple-fm v${pkg.version} - a simple Last.fm wrapper written in TypeScript (https://github.com/solelychloe/simple-fm)`) {
++    constructor(key, userAgent = `simple-fm - a simple Last.fm wrapper written in TypeScript (https://github.com/solelychloe/simple-fm)`) {
+         this.key = key;
+         this.userAgent = userAgent;
+     }
+diff --git a/dist/index.js b/dist/index.js
+index fe0dfb1cd2c5a9022df2342ede16215a7b9c95ec..c7657fae1c2bcc77ff29d68ecb5eed87980e98a6 100644
+--- a/dist/index.js
++++ b/dist/index.js
+@@ -6,7 +6,6 @@ import Tag from './classes/tag.class.js';
+ import Track from './classes/track.class.js';
+ import User from './classes/user.class.js';
+ import LastFMError from './utils/error.js';
+-import { pkg } from './utils/package.js';
+ export default class SimpleFMClient {
+     key;
+     options;
+@@ -21,7 +20,7 @@ export default class SimpleFMClient {
+         this.key = key;
+         this.options = options;
+         this.validateApiKey();
+-        options.userAgent ??= `simple-fm v${pkg.version} - a simple Last.fm wrapper written in TypeScript (https://github.com/solelychloe/simple-fm)`;
++        options.userAgent ??= `simple-fm - a simple Last.fm wrapper written in TypeScript (https://github.com/solelychloe/simple-fm)`;
+         this.album = this.createService(Album);
+         this.artist = this.createService(Artist);
+         this.chart = this.createService(Chart);
+diff --git a/dist/utils/package.d.ts b/dist/utils/package.d.ts
+deleted file mode 100644
+index 1a1e05eb5f32206e6eb684cd7b4605e8a480f124..0000000000000000000000000000000000000000
+diff --git a/dist/utils/package.js b/dist/utils/package.js
+deleted file mode 100644
+index 9166628a8ff669611343d1b53a5f02b58b20f12f..0000000000000000000000000000000000000000

@@ -1,100 +1,153 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Todos</title>
-    <link
-      href="https://cdn.jsdelivr.net/npm/tailwindcss/dist/tailwind.min.css"
-      rel="stylesheet"
-    />
-  </head>
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width,initial-scale=1" />
+		<title>Todos</title>
+		<link href="https://cdn.jsdelivr.net/npm/tailwindcss/dist/tailwind.min.css" rel="stylesheet" />
 
-  <body class="bg-blue-100">
-    <div class="w-full h-full flex content-center justify-center mt-8">
-      <div class="bg-white shadow-md rounded px-8 pt-6 py-8 mb-4">
-        <h1 class="block text-grey-800 text-md font-bold mb-2">Todos</h1>
-        <div class="flex">
-          <input
-            class="shadow appearance-none border rounded w-full py-2 px-3 text-grey-800 leading-tight focus:outline-none focus:shadow-outline"
-            type="text"
-            name="name"
-            placeholder="A new todo"
-          />
-          <button
-            class="bg-blue-500 hover:bg-blue-800 text-white font-bold ml-2 py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-            id="create"
-            type="submit"
-          >
-            Create
-          </button>
-        </div>
-        <div class="mt-4" id="todos"></div>
-      </div>
-    </div>
-  </body>
+		<style>
+			.albumCard {
+				background-position: 50%;
+				background-size: cover;
+				border-radius: 2px;
+				box-shadow: -2px 2px 4px rgba(0, 0, 0, 0.3);
+				overflow: hidden;
+				position: relative;
+				top: 0;
+				transition: all 0.2s ease-out;
+			}
+			.albumCard::before {
+				content: '';
+				display: block;
+				padding-top: 100%;
+			}
+			.albumCard-caption {
+				background-color: rgba(0, 0, 0, 0);
+				background-image: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.5));
+				color: rgb(222, 219, 215);
+				text-shadow: rgba(0, 0, 0, 0.7) 0px 0px 10px;
+			}
+		</style>
+	</head>
 
-  <script>
-    window.todos = $TODOS;
+	<body class="bg-blue-100">
+		<div class="w-full h-full flex content-center justify-center mt-8">
+			<div class="bg-white shadow-md rounded px-8 pt-6 py-8 mb-4">
+				<h1 class="block text-grey-800 text-md font-bold mb-2">Search for your new favourite song</h1>
+				<div class="flex">
+					<input
+						class="shadow appearance-none border rounded w-full py-2 px-3 text-grey-800 leading-tight focus:outline-none focus:shadow-outline"
+						type="text"
+						name="name"
+						placeholder="Unfold"
+					/>
+					<button
+						class="bg-blue-500 hover:bg-blue-800 text-white font-bold ml-2 py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+						id="create"
+						type="submit"
+					>
+						Search
+					</button>
+				</div>
+				<div class="mt-4 grid grid-cols-4 gap-3" id="songs"></div>
+			</div>
+		</div>
+	</body>
 
-    var updateTodos = function () {
-      fetch('/', {
-        method: 'PUT',
-        body: JSON.stringify({ todos: window.todos })
-      });
-      populateTodos();
-    };
+	<script>
+		window.songs = [];
+		window.favsong = $FAVSONG;
 
-    var completeTodo = function (evt) {
-      var checkbox = evt.target;
-      var todoElement = checkbox.parentNode;
-      var newTodoSet = [].concat(window.todos);
-      var todo = newTodoSet.find(t => t.id == todoElement.dataset.todo);
-      todo.completed = !todo.completed;
-      window.todos = newTodoSet;
-      updateTodos();
-    };
+		// var updateTodos = function () {
+		// 	fetch('/', {
+		// 		method: 'PUT',
+		// 		body: JSON.stringify({ song: window.songs }),
+		// 	});
+		// 	populateTodos();
+		// };
+		//
+		// var completeTodo = function (evt) {
+		// 	var checkbox = evt.target;
+		// 	var todoElement = checkbox.parentNode;
+		// 	var newTodoSet = [].concat(window.todos);
+		// 	var todo = newTodoSet.find((t) => t.id == todoElement.dataset.todo);
+		// 	todo.completed = !todo.completed;
+		// 	window.todos = newTodoSet;
+		// 	updateTodos();
+		// };
+		//
+		// var populateTodos = function () {
+		// 	var todoContainer = document.querySelector('#todos');
+		// 	todoContainer.innerHTML = null;
+		//
+		// 	window.todos.forEach((todo) => {
+		// 		var el = document.createElement('div');
+		// 		el.className = 'border-t py-4';
+		// 		el.dataset.todo = todo.id;
+		//
+		// 		var name = document.createElement('span');
+		// 		name.className = todo.completed ? 'line-through' : '';
+		// 		name.textContent = todo.name;
+		//
+		// 		var checkbox = document.createElement('input');
+		// 		checkbox.className = 'mx-4';
+		// 		checkbox.type = 'checkbox';
+		// 		checkbox.checked = todo.completed ? 1 : 0;
+		// 		checkbox.addEventListener('click', completeTodo);
+		//
+		// 		el.appendChild(checkbox);
+		// 		el.appendChild(name);
+		// 		todoContainer.appendChild(el);
+		// 	});
+		// };
+		//
+		// populateTodos();
 
-    var populateTodos = function () {
-      var todoContainer = document.querySelector('#todos');
-      todoContainer.innerHTML = null;
+		function populateSongs() {
+			const songContainer = document.getElementById('songs');
+			songContainer.innerHTML = null;
 
-      window.todos.forEach(todo => {
-        var el = document.createElement('div');
-        el.className = 'border-t py-4';
-        el.dataset.todo = todo.id;
+			window.songs.forEach((song) => {
+				let el = document.createElement('div');
+				el.className = 'albumCard h-44';
 
-        var name = document.createElement('span');
-        name.className = todo.completed ? 'line-through' : '';
-        name.textContent = todo.name;
+				let caption = document.createElement('div');
+				el.className = 'albumCard-caption px-3 pb-2';
 
-        var checkbox = document.createElement('input');
-        checkbox.className = 'mx-4';
-        checkbox.type = 'checkbox';
-        checkbox.checked = todo.completed ? 1 : 0;
-        checkbox.addEventListener('click', completeTodo);
+				let title = document.createElement('strong');
+				title.className = 'albumCard-title';
+				title.innerText = song.name;
+				let artist = document.createElement('span');
+				artist.className = 'albumCard-artist';
+				artist.innerText = song.artist.name;
 
-        el.appendChild(checkbox);
-        el.appendChild(name);
-        todoContainer.appendChild(el);
-      });
-    };
+				caption.appendChild(title);
+				caption.appendChild(document.createElement('br'));
+				caption.appendChild(artist);
 
-    populateTodos();
+				el.appendChild(caption);
 
-    var createTodo = function () {
-      var input = document.querySelector('input[name=name]');
-      if (input.value.length) {
-        window.todos = [].concat(todos, {
-          id: `${window.todos.length + 1}`,
-          name: input.value,
-          completed: false
-        });
-        input.value = '';
-        updateTodos();
-      }
-    };
+				songContainer.appendChild(el);
+			});
+		}
 
-    document.querySelector('#create').addEventListener('click', createTodo);
-  </script>
+		async function search() {
+			let query = document.querySelector('input').value;
+			let data = await (
+				await fetch('/', {
+					method: 'POST',
+					body: JSON.stringify({
+						op: 'search',
+						query: query,
+					}),
+				})
+			).json();
+
+			window.songs = data.tracks;
+			populateSongs();
+		}
+
+		document.querySelector('#create').addEventListener('click', search);
+	</script>
 </html>
