@@ -8,6 +8,7 @@
 
 		<style>
 			.albumCard {
+				cursor: pointer;
 				background-position: 50%;
 				background-size: cover;
 				border-radius: 2px;
@@ -20,7 +21,8 @@
 			.albumCard::before {
 				content: '';
 				display: block;
-				padding-top: 100%;
+				/* padding-top: 100%; */
+				padding-top: 52%;
 			}
 			.albumCard-caption {
 				background-color: rgba(0, 0, 0, 0);
@@ -33,7 +35,7 @@
 
 	<body class="bg-blue-100">
 		<div class="w-full h-full flex content-center justify-center mt-8">
-			<div class="bg-white shadow-md rounded px-8 pt-6 py-8 mb-4">
+			<div class="bg-white shadow-md rounded px-8 pt-6 py-8 mb-4" id="container">
 				<h1 class="block text-grey-800 text-md font-bold mb-2">Search for your new favourite song</h1>
 				<div class="flex">
 					<input
@@ -59,50 +61,23 @@
 		window.songs = [];
 		window.favsong = $FAVSONG;
 
-		// var updateTodos = function () {
-		// 	fetch('/', {
-		// 		method: 'PUT',
-		// 		body: JSON.stringify({ song: window.songs }),
-		// 	});
-		// 	populateTodos();
-		// };
-		//
-		// var completeTodo = function (evt) {
-		// 	var checkbox = evt.target;
-		// 	var todoElement = checkbox.parentNode;
-		// 	var newTodoSet = [].concat(window.todos);
-		// 	var todo = newTodoSet.find((t) => t.id == todoElement.dataset.todo);
-		// 	todo.completed = !todo.completed;
-		// 	window.todos = newTodoSet;
-		// 	updateTodos();
-		// };
-		//
-		// var populateTodos = function () {
-		// 	var todoContainer = document.querySelector('#todos');
-		// 	todoContainer.innerHTML = null;
-		//
-		// 	window.todos.forEach((todo) => {
-		// 		var el = document.createElement('div');
-		// 		el.className = 'border-t py-4';
-		// 		el.dataset.todo = todo.id;
-		//
-		// 		var name = document.createElement('span');
-		// 		name.className = todo.completed ? 'line-through' : '';
-		// 		name.textContent = todo.name;
-		//
-		// 		var checkbox = document.createElement('input');
-		// 		checkbox.className = 'mx-4';
-		// 		checkbox.type = 'checkbox';
-		// 		checkbox.checked = todo.completed ? 1 : 0;
-		// 		checkbox.addEventListener('click', completeTodo);
-		//
-		// 		el.appendChild(checkbox);
-		// 		el.appendChild(name);
-		// 		todoContainer.appendChild(el);
-		// 	});
-		// };
-		//
-		// populateTodos();
+		console.log(favsong);
+
+		async function selectSong(e) {
+			let song = e.target.dataset.song;
+
+			let data = await (
+				await fetch('/', {
+					method: 'POST',
+					body: JSON.stringify({
+						op: 'save',
+						song: song,
+					}),
+				})
+			).json();
+
+			console.log(data);
+		}
 
 		function populateSongs() {
 			const songContainer = document.getElementById('songs');
@@ -111,9 +86,11 @@
 			window.songs.forEach((song) => {
 				let el = document.createElement('div');
 				el.className = 'albumCard h-44';
+				el.dataset.song = JSON.stringify(song);
+				el.addEventListener('click', selectSong);
 
 				let caption = document.createElement('div');
-				el.className = 'albumCard-caption px-3 pb-2';
+				caption.className = 'albumCard-caption px-3 pb-2';
 
 				let title = document.createElement('strong');
 				title.className = 'albumCard-title';
@@ -147,7 +124,24 @@
 			window.songs = data.tracks;
 			populateSongs();
 		}
-
 		document.querySelector('#create').addEventListener('click', search);
+
+		if (favsong) {
+			let el = document.getElementById('container');
+
+			let currentContainer = document.createElement('div');
+			currentContainer.className = 'flex flex-row gap-1 pb-2';
+
+			let pre = document.createElement('h1');
+			pre.className = 'font-bold text-md';
+			pre.innerText = 'Current favourite song:';
+			let name = document.createElement('h1');
+			name.innerText = `${favsong.name} - ${favsong.artist.name}`;
+
+			currentContainer.appendChild(pre);
+			currentContainer.appendChild(name);
+
+			el.prepend(currentContainer);
+		}
 	</script>
 </html>
